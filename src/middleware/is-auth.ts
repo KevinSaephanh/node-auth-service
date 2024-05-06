@@ -3,6 +3,11 @@ import { verify, JwtPayload } from 'jsonwebtoken';
 import { asyncWrap } from './async-wrap';
 import { ApiError } from '@/utilts/api-error';
 import { config } from '@/config/app.config';
+import { UserDocument } from '@/models/User';
+
+export interface UserRequest extends Request {
+  user: UserDocument;
+}
 
 export const isAuth = asyncWrap(async (req: Request, _res: Response) => {
   const token = req.headers['authorization']?.split(' ')?.[1];
@@ -13,7 +18,7 @@ export const isAuth = asyncWrap(async (req: Request, _res: Response) => {
 
   try {
     const { user } = verify(token, config.auth.accessTokenSecret) as JwtPayload;
-    req.user = user;
+    (req as UserRequest).user = user;
   } catch (err) {
     throw new ApiError(401, 'Unauthorized');
   }

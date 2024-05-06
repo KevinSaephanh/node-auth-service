@@ -15,16 +15,16 @@ export class AuthController {
   }
 
   async googleOauthRedirect(req: Request, res: Response) {
-    const user = await this.authService.googleOauthRedirect(req.body.code);
-    if (user) {
-      res.status(200).send({ user });
+    const data = await this.authService.googleOauthRedirect(req.body.code, res);
+    if (data) {
+      res.status(200).send(data);
     } else {
       res.json(401).send({ message: 'Google oauth failed' });
     }
   }
 
   async githubOauthRedirect(req: Request, res: Response) {
-    const data = await this.authService.githubOauthRedirect(req.body.code);
+    const data = await this.authService.githubOauthRedirect(req.body.code, res);
     if (data) {
       res.status(200).send(data);
     } else {

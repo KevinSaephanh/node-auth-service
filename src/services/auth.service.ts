@@ -53,17 +53,23 @@ export class AuthService {
     return accessToken;
   }
 
-  async googleOauthRedirect(code: string) {
-    const res = await this.googleClient.getToken(code);
-    const idToken = res.tokens.id_token as string;
+  async googleOauthRedirect(code: string, res: Response) {
+    const googleResponse = await this.googleClient.getToken(code);
+    const idToken = googleResponse.tokens.id_token as string;
     const ticket = await this.googleClient.verifyIdToken({
       idToken,
       audience: config.auth.oauth.googleClientId,
     });
-    return ticket.getPayload();
+    const payload = ticket.getPayload();
+    if (payload) {
+      const { accessToken } = this.tokenService.signTokens(payload.sub, res);
+      return { accessToken, user: payload };
+    }
+    return null;
   }
 
-  async githubOauthRedirect(code: string) {
+  async githubOauthRedirect(code: string, res: Response) {
+    // Get github access token
     const tokenResponse = await axios.post(
       'https://github.com/login/oauth/access_token',
       {
@@ -79,10 +85,24 @@ export class AuthService {
         }),
       }
     );
-    return {
-      user: tokenResponse.data.user,
-      accessToken: tokenResponse.data.access_token,
-    };
+    if (tokenResponse.status !== 200) {
+      throw new ApiError(400, 'Error fetching access token from Github');
+    }
+
+    // Fetch user data with access token
+    const userResponse = await axios.get('https://api.github.com/user', {
+      headers: {
+        Authorization: `${tokenResponse.data['access_token']} ${tokenResponse.data['token_type']}`,
+      },
+    });
+    if (userResponse.status !== 200) {
+      throw new ApiError(400, 'Error fetching user data from Github');
+    }
+
+    // Create JWTs
+    const user = userResponse.data;
+    const { accessToken } = this.tokenService.signTokens(user.id, res);
+    return { accessToken, user };
   }
 
   async logout(res: Response) {

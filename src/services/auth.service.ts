@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import logger from '@/utilts/logger';
 import { ApiError } from '@/utilts/api-error';
 import { TokenService } from './token.service';
 import { LoginDto, SignupDto } from '@/dtos/auth.dto';
@@ -27,7 +26,6 @@ export class AuthService {
     res: Response
   ) {
     if (password !== confirmPassword) {
-      logger.error(`'${password}' does not match '${confirmPassword}'`);
       throw new ApiError(400, 'Passwords do not match');
     }
 

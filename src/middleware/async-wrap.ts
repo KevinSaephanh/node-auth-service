@@ -1,4 +1,3 @@
-import logger from '@/utilts/logger';
 import { NextFunction, Request, Response } from 'express';
 
 export const asyncWrap = (fn: Function) =>
@@ -13,7 +12,6 @@ export const asyncWrap = (fn: Function) =>
         await fn(req, res, next, ...args);
         next();
       } catch (err) {
-        logger.error(err);
         next(err);
       }
     })();

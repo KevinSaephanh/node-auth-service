@@ -5,8 +5,8 @@ export class AuthController {
   private readonly authService = new AuthService();
 
   async signup(req: Request, res: Response) {
-    const data = await this.authService.signup(req.body, res);
-    res.status(201).send(data);
+    await this.authService.signup(req.body, res);
+    res.status(201).send({ message: 'Verification email sent' });
   }
 
   async login(req: Request, res: Response) {

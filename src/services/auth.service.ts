@@ -37,9 +37,13 @@ export class AuthService {
       password,
     });
 
-    // Create tokens and set
-    const { accessToken } = this.tokenService.signTokens(user.id, res);
-    return accessToken;
+    // Create token and send email
+    const accessToken = this.tokenService.signToken(user.id, 'access');
+    await this.mailerService.sendVerificationEmail(
+      user.email,
+      user.username,
+      accessToken
+    );
   }
 
   async login({ email, password }: LoginDto, res: Response) {

@@ -7,10 +7,12 @@ import { compare } from 'bcrypt';
 import axios from 'axios';
 import { config } from '@/config/app.config';
 import { OAuth2Client } from 'google-auth-library';
+import { MailerService } from './mailer.service';
 
 export class AuthService {
   private readonly userService = new UserService();
   private readonly tokenService = new TokenService();
+  private readonly mailerService = new MailerService();
   private googleClient: OAuth2Client;
 
   constructor() {
@@ -41,11 +43,16 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto, res: Response) {
-    const user = await this.userService.findByProp('email', email);
+    const user = await this.userService.findUserBy({ email, active: true });
+
+    // User doesn't exist or is unverified
+    if (!user) {
+      throw new ApiError(404, 'User not found or unverified');
+    }
 
     // Compare passwords is user exists
     if (!(await compare(password, user.password))) {
-      throw new ApiError(404, 'Username and/or password is incorrect');
+      throw new ApiError(404, 'Email and/or password is incorrect');
     }
 
     // Create tokens and set
@@ -115,16 +122,46 @@ export class AuthService {
       throw new ApiError(403, 'No refresh token provided');
     }
     const { userId } = this.tokenService.verifyToken(refreshToken, 'refresh');
-    const user = await this.userService.findByProp('id', userId);
+    const user = await this.userService.findUserBy({ id: userId });
     const accessToken = this.tokenService.signToken(userId, 'access');
     return { user, accessToken };
+  }
+
+  async sendVerificationEmail(email: string) {
+    const user = await this.userService.findUserBy({ email });
+    const token = this.tokenService.signToken(user.id, 'access');
+    await this.mailerService.sendVerificationEmail(email, user.username, token);
+  }
+
+  async verifyEmail(token: string, res: Response) {
+    // Decode token to retrieve user id
+    const decoded = this.tokenService.verifyToken(token, 'access');
+
+    // Find and update user
+    const user = await this.userService.findUserBy({ id: decoded.userId });
+    user.active = true;
+    await this.userService.updateUser(user);
+
+    // Sign tokens and return with user
+    const { accessToken } = this.tokenService.signTokens(user.id, res);
+    return { user, accessToken };
+  }
+
+  async sendPasswordResetEmail(email: string) {
+    const user = await this.userService.findUserBy({ email });
+    const token = this.tokenService.signToken(user.id, 'access');
+    await this.mailerService.sendPasswordResetEmail(
+      email,
+      user.username,
+      token
+    );
   }
 
   async updatePassword(
     userId: string,
     { oldPassword, newPassword, confirmNewPassword }: any
   ) {
-    const user = await this.userService.findByProp('id', userId);
+    const user = await this.userService.findUserBy({ id: userId });
 
     // Check old password matches current password
     if (!user || !(await compare(oldPassword, user.password))) {

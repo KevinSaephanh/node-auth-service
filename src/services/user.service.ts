@@ -1,3 +1,4 @@
+import { PartialUserRecord } from '@/dtos/auth.dto';
 import { User, UserDocument } from '@/models/User';
 import { ApiError } from '@/utilts/api-error';
 
@@ -11,8 +12,8 @@ export class UserService {
     }
   }
 
-  async findByProp(name: keyof UserDocument, value: any) {
-    const user = await User.findOne({ [name]: value });
+  async findUserBy(conditions: PartialUserRecord<keyof UserDocument, any>) {
+    const user = await User.findOne(conditions);
     if (!user) {
       throw new ApiError(404, 'User not found');
     }

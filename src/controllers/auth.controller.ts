@@ -42,6 +42,24 @@ export class AuthController {
     res.status(200).send({ accessToken });
   }
 
+  async sendVerificationEmail(req: Request, res: Response) {
+    await this.authService.sendVerificationEmail(req.body);
+    res.status(200).send();
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    const data = await this.authService.verifyEmail(
+      req.query['token'] as string,
+      res
+    );
+    res.status(200).send(data);
+  }
+
+  async sendPasswordResetEmail(req: Request, res: Response) {
+    await this.authService.sendPasswordResetEmail(req.body);
+    res.status(200).send();
+  }
+
   async updatePassword(req: Request, res: Response) {
     const updatedUser = await this.authService.updatePassword(
       req.params.token,

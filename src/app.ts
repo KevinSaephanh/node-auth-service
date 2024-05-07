@@ -1,6 +1,6 @@
 import express from 'express';
 import helmet from 'helmet';
-import passport from 'passport';
+import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes';
 import { errorHandler } from './middleware/error-handler';
 import { config } from './config/app.config';
@@ -17,13 +17,10 @@ const main = async () => {
   // Routes
   app.use('/api/v1/auth', authRoutes);
 
-  // Passport
-  app.use(passport.initialize());
-  app.use(passport.session());
-
   // Middlewares
   app.use(errorHandler);
   app.use(helmet());
+  app.use(cookieParser());
 
   // Mongoose
   await connectToDb();

@@ -36,6 +36,15 @@ router.post(
 );
 router.post('/logout', isAuth, asyncWrap(authController.logout));
 router.post('/refresh-token', asyncWrap(authController.refreshToken));
+router.post(
+  '/send-verification-email',
+  asyncWrap(authController.sendVerificationEmail)
+);
+router.post('/verify-email', asyncWrap(authController.verifyEmail));
+router.patch(
+  '/send-password-reset-email',
+  asyncWrap(authController.sendPasswordResetEmail)
+);
 router.patch(
   '/user/update-password',
   isAuth,

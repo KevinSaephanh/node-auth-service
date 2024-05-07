@@ -21,5 +21,9 @@ export const config = {
       googleClientSecret: getEnvVar('GOOGLE_CLIENT_SECRET'),
     },
   },
+  email: {
+    smtp: getEnvVar('EMAIL_SMTP'),
+    from: getEnvVar('EMAIL_FROM'),
+  },
   dbUrl: getEnvVar('MONGODB_URI'),
 };

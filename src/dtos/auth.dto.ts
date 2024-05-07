@@ -1,3 +1,5 @@
+import { UserDocument } from '@/models/User';
+
 export interface SignupDto {
   username: string;
   email: string;
@@ -12,3 +14,7 @@ export interface UpdatePasswordDto {
   newPassword: string;
   confirmNewPassword: string;
 }
+
+export type PartialUserRecord<K extends keyof UserDocument, T> = Partial<
+  Record<K, T>
+>;

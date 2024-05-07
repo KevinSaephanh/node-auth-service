@@ -14,6 +14,7 @@ export type UserDocument = mongoose.Document & {
   password: string;
   avatar: string;
   role: Role;
+  active: boolean;
 };
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -24,6 +25,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
     password: { type: String, required: true },
     avatar: String,
     role: { type: String, enum: Role, default: Role.Basic },
+    active: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

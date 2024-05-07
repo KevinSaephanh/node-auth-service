@@ -5,13 +5,13 @@ export class AuthController {
   private readonly authService = new AuthService();
 
   async signup(req: Request, res: Response) {
-    await this.authService.signup(req.body, res);
-    res.status(201).send({ message: 'Email has been sent' });
+    const data = await this.authService.signup(req.body, res);
+    res.status(201).send(data);
   }
 
   async login(req: Request, res: Response) {
-    const accessToken = await this.authService.login(req.body, res);
-    res.status(200).send({ accessToken });
+    const data = await this.authService.login(req.body, res);
+    res.status(200).send(data);
   }
 
   async googleOauthRedirect(req: Request, res: Response) {

@@ -50,7 +50,7 @@ export class AuthService {
 
     // Create tokens and set
     const { accessToken } = this.tokenService.signTokens(user.id, res);
-    return accessToken;
+    return { user, accessToken };
   }
 
   async googleOauthRedirect(code: string, res: Response) {
@@ -63,7 +63,7 @@ export class AuthService {
     const payload = ticket.getPayload();
     if (payload) {
       const { accessToken } = this.tokenService.signTokens(payload.sub, res);
-      return { accessToken, user: payload };
+      return { user: payload, accessToken };
     }
     return null;
   }
@@ -102,7 +102,7 @@ export class AuthService {
     // Create JWTs
     const user = userResponse.data;
     const { accessToken } = this.tokenService.signTokens(user.id, res);
-    return { accessToken, user };
+    return { user, accessToken };
   }
 
   async logout(res: Response) {
@@ -115,7 +115,9 @@ export class AuthService {
       throw new ApiError(403, 'No refresh token provided');
     }
     const { userId } = this.tokenService.verifyToken(refreshToken, 'refresh');
-    return this.tokenService.signToken(userId, 'access');
+    const user = await this.userService.findByProp('id', userId);
+    const accessToken = this.tokenService.signToken(userId, 'access');
+    return { user, accessToken };
   }
 
   async updatePassword(

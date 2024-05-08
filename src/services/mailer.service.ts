@@ -2,7 +2,6 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { createTransport, Transporter } from 'nodemailer';
 import logger from '@/utilts/logger';
 import { config } from '@/config/app.config';
-import { UserDocument } from '@/models/User';
 
 export interface SendEmailParams {
   from?: string;
@@ -30,14 +29,15 @@ export class MailerService {
       subject: 'Email Verification',
       html: `Hello ${name},
       <br /><br />
-      Thank you for registering. Please confirm your account by clicking the link below.
+      <span>Thank you for registering. Please confirm your account by clicking the link below.</span>
       <a clicktracking="off" href='${this.baseUrl}/auth/verify?token=${token}'>
         Confirm my email
       </a>
+      <span>NOTE: this link is valid for 24 hours</span>
       <br /><br />
-      Thanks,
+      <span>Thanks,</span>
       <br />
-      ImageGen`,
+      <span>ImageGen</span>`,
     });
   }
 
@@ -47,7 +47,10 @@ export class MailerService {
       subject: 'Reset Your Password',
       html: `<span> Hello ${username},</span>
       <br /> <br/>
-      <span>Please reset your password <a clicktracking="off" href='${this.baseUrl}/auth/set-password?token=${token}'>here</a></span>
+      <span>Please reset your password with this 
+        <a clicktracking="off" href='${this.baseUrl}/auth/set-password?token=${token}'>link</a>
+      </span>
+      <span>NOTE: this link is valid for 24 hours</span>
       <br /> <br/>
       <span>Thanks,</span>
       <br />

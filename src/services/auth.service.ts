@@ -120,7 +120,7 @@ export class AuthService {
     this.tokenService.clearTokens(res);
   }
 
-  async refreshToken(req: Request) {
+  async refresh(req: Request) {
     const refreshToken = req.cookies['refresh_token'];
     if (!refreshToken) {
       throw new ApiError(403, 'No refresh token provided');

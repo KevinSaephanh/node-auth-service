@@ -35,7 +35,7 @@ router.post(
   asyncWrap(authController.githubOauthRedirect)
 );
 router.post('/logout', isAuth, asyncWrap(authController.logout));
-router.post('/refresh-token', asyncWrap(authController.refreshToken));
+router.post('/refresh', asyncWrap(authController.refresh));
 router.post(
   '/send-verification-email',
   asyncWrap(authController.sendVerificationEmail)

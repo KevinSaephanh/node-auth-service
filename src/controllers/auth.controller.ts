@@ -37,9 +37,9 @@ export class AuthController {
     res.status(204).send();
   }
 
-  async refreshToken(req: Request, res: Response) {
-    const accessToken = await this.authService.refreshToken(req);
-    res.status(200).send({ accessToken });
+  async refresh(req: Request, res: Response) {
+    const data = await this.authService.refresh(req);
+    res.status(200).send(data);
   }
 
   async sendVerificationEmail(req: Request, res: Response) {

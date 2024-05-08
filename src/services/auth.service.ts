@@ -8,6 +8,7 @@ import axios from 'axios';
 import { config } from '@/config/app.config';
 import { OAuth2Client } from 'google-auth-library';
 import { MailerService } from './mailer.service';
+import { UserDocument } from '@/models/User';
 
 export class AuthService {
   private readonly userService = new UserService();
@@ -23,10 +24,7 @@ export class AuthService {
     );
   }
 
-  async signup(
-    { email, username, password, confirmPassword }: SignupDto,
-    res: Response
-  ) {
+  async signup({ email, username, password, confirmPassword }: SignupDto) {
     if (password !== confirmPassword) {
       throw new ApiError(400, 'Passwords do not match');
     }
@@ -161,23 +159,14 @@ export class AuthService {
     );
   }
 
-  async updatePassword(
-    userId: string,
-    { oldPassword, newPassword, confirmNewPassword }: any
-  ) {
+  async updatePassword(token: string, password: string, res: Response) {
+    // Verify token and update user password
+    const { userId } = this.tokenService.verifyToken(token, 'access');
     const user = await this.userService.findUserBy({ id: userId });
+    await this.userService.updateUser({ ...user, password } as UserDocument);
 
-    // Check old password matches current password
-    if (!user || !(await compare(oldPassword, user.password))) {
-      throw new ApiError(400, 'Password is incorrect');
-    }
-
-    // Check new password matches confirm password
-    if (newPassword !== confirmNewPassword) {
-      throw new ApiError(404, 'New password does not match.');
-    }
-
-    user.password = newPassword;
-    return this.userService.updateUser(user);
+    // Sign tokens and return with user
+    const { accessToken } = this.tokenService.signTokens(user.id, res);
+    return { user, accessToken };
   }
 }

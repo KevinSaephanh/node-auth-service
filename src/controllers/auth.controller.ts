@@ -5,7 +5,7 @@ export class AuthController {
   private readonly authService = new AuthService();
 
   async signup(req: Request, res: Response) {
-    await this.authService.signup(req.body, res);
+    await this.authService.signup(req.body);
     res.status(201).send({ message: 'Verification email sent' });
   }
 
@@ -61,10 +61,11 @@ export class AuthController {
   }
 
   async updatePassword(req: Request, res: Response) {
-    const updatedUser = await this.authService.updatePassword(
+    const data = await this.authService.updatePassword(
       req.params.token,
-      req.body.password
+      req.body.password,
+      res
     );
-    res.status(200).send(updatedUser);
+    res.status(200).send(data);
   }
 }

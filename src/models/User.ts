@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
     _id: { type: String, default: () => uuidv4() },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: false },
     avatar: String,
     role: { type: String, enum: Role, default: Role.Basic },
     active: { type: Boolean, default: false },

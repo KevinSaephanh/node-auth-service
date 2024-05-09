@@ -45,6 +45,15 @@ router.patch(
   '/send-password-reset-email',
   asyncWrap(authController.sendPasswordResetEmail)
 );
-router.patch('/user/update-password', asyncWrap(authController.updatePassword));
+router.get(
+  '/verify-reset-password-token',
+  isAuth,
+  asyncWrap(authController.verifyResetPasswordToken)
+);
+router.patch(
+  '/user/update-password',
+  isAuth,
+  asyncWrap(authController.updatePassword)
+);
 
 export default router;

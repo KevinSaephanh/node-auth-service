@@ -60,6 +60,10 @@ export class AuthController {
     res.status(200).send();
   }
 
+  async verifyResetPasswordToken(_req: Request, res: Response) {
+    res.status(204).send();
+  }
+
   async updatePassword(req: Request, res: Response) {
     const data = await this.authService.updatePassword(
       req.params.token,
